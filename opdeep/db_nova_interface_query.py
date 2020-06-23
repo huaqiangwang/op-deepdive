@@ -7,6 +7,7 @@ from nova import context
 class TestContext(unittest.TestCase):
     """ Create Nova context out of Nova source tree
 
+
     To create a context for test case using for purpose of reading
     database.
     """
