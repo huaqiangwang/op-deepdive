@@ -1,12 +1,13 @@
 from pprint import pprint
 import unittest
 
+from nova.objects.instance_numa import InstanceNUMACell
 from oslo_versionedobjects.base import VersionedObject,VersionedObjectRegistry
 from oslo_versionedobjects.fields import IntegerField, StringField
 
 
 # TODO(huaqiang): VersionedObject descendent must override the function 'obj_load_attr'?
-# TODO(huaqiang): What's the impact of 'property' statement in
+# TODO(huaqiang): What's the impact of the 'property' statement defined in
 #                 oslo_versionedobjects.base._make_class_properties
 @VersionedObjectRegistry.register
 class FieldClass(VersionedObject):
@@ -25,7 +26,7 @@ class FieldClass(VersionedObject):
 
     # NOTE(huaqiang):
     # VersionedObjectRegistry.register method converts the registering class 'field'
-    # items into its properties with the customized property functions.
+    # items as its properties with the customized property functions.
     # After register OP, class has two kinds of property, the ones has the same name
     # of 'field' items, and the ones left.
     def __setattr__(self, key, value):
@@ -99,3 +100,12 @@ class TestField(unittest.TestCase):
         self.assertFalse('count' in testClass)
         testClass.count = 1
         self.assertTrue('count' in testClass)
+
+    def test_nova_instancenumacell_undefine_error(self):
+        numacell = InstanceNUMACell(id=0)
+        def _access_cpuset(numacell):
+            print(numacell.cpuset)
+        # NOTE(huaqiang): In class 'InstanceNUMACell', the obj_load_attr method
+        # is not overridden also. For any property not calling its @property.setter
+        # method returns a 'NotImplementedError'.
+        self.assertRaises(NotImplementedError, _access_cpuset, numacell)
